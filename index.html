@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="bower_components/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+
+    <script src="bower_components/popper.js/src"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+    .red{
+        background-color: red;
+    }
+    .blue{
+        background-color: blue;
+    }
+    .green{
+        background-color: green;
+    }
+
+    .menu{
+      background-color: #6c757d;
+      height: 100vh;
+    }
+
+    div.menu > button {
+      background-color: #6c757d;
+      color: #000;
+      font-weight: bolder;
+
+    }
+    div.menu > button:hover{
+      background-color: transparent;
+      border-color: transparent;
+    }
+
+</style>
+
+</head>
+<body>
+
+      <div class="row">
+        <div class="col-12 col-md-2 red menu">
+          <button type="button" class="btn btn-secondary">Personas</button>
+          <button type="button" class="btn btn-secondary">Personajes</button>
+          <button type="button" class="btn btn-secondary">Anecdotas</button>
+          <button type="button" class="btn btn-secondary">Capitulos</button>
+
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
+              Maestros
+            </button>
+            <ul id="menu" class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <li><button class="dropdown-item" href="#">Action</button></li>
+              <li><button class="dropdown-item" href="#">Another action</button></li>
+              <li><button class="dropdown-item" href="#">Something else here</button></li>
+              <li>
+                <button class="dropdown-item" href="#">
+                  <i class="fas fa-eye"></i>
+                  <i class="fas fa-pencil-alt"></i>
+                  <i class="fas fa-trash"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="col-12 col-md-10 green">
+          One of three columns
+        </div>
+      </div>
+
+
+</body>
+</html>
