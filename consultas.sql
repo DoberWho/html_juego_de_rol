@@ -32,6 +32,22 @@ WHERE(SELECT id FROM lugares WHERE nombre = "Taberna 7ºCielo"))
 
 -- ID, y Nombre de las personas con personajes que tuvieran la habilidad 'Bola de Fuego'
 -- Los capitulos que tengan personajes que estén relacionados como pareja
+SELECT DISTINCT(c.id) as id, c.titulo
+FROM capitulos c
+JOIN mn_personaje_capitulo mpc ON mpc.id_capitulo = c.id
+WHERE  mpc.id_personaje IN (
+    SELECT pj.id
+    FROM personaje pj
+    JOIN relacion r ON r.id_personaje = pj.id
+    JOIN tipo_relacion tr ON tr.id = r.id_tipo_relacion
+    WHERE tr.nombre = 'pareja'
+UNION ALL
+SELECT pj.id
+    FROM personaje pj
+    JOIN relacion r ON r.id_relacionado = pj.id
+    JOIN tipo_relacion tr ON tr.id = r.id_tipo_relacion
+    WHERE tr.nombre = 'pareja');
+
 -- ¿Que habilidades tienen los personajes casados?
 -- ¿Que trabajos podemos encontrar en las anecdotas de 'La catedral del Dolor'?
 -- Razas que sean jugado en alguna partida
@@ -48,13 +64,35 @@ HAVING COUNT(mn.id_anecdota) > 1;
 
 
 -- Todas las relaciones de los personajes del capitulo 1
+SELECT DISTINCT(tp.id), tp.nombre
+FROM capitulos c
+JOIN mn_personaje_capitulo mnpc ON mnpc.id_capitulo = c.id
+JOIN personaje pj ON pj.id = mnpc.id_personaje
+JOIN relacion r ON (pj.id = r.id_personaje OR pj.id = r.id_relacionado)
+JOIN tipo_relacion tp ON tp.id = r.id_tipo_relacion
+WHERE c.titulo = "Cap 01"
+
+
 -- Habilidades de los elfos
+SELECT id, nombre FROM habilidades
+WHERE id IN (
+    SELECT id_habilidad FROM mn_habilidad_personaje
+    WHERE id_personaje IN (
+        SELECT id FROM personaje pj
+        WHERE id_raza IN (
+            SELECT r.id FROM raza r
+            WHERE r.nombre LIKE "%Elfo%")
+    )
+)
+
 -- ¿Cual es la media de altura de los enanos?
 -- ¿Cual es la media de los personajes de una persona?
+SELECT (20 / 5)
+SELECT ((SELECT COUNT(*) FROM personaje) / (SELECT COUNT(p.id) FROM persona p JOIN personaje pj ON pj.id_persona = p.id) )
+
+
 -- ¿Cual es la raza habitual de 'Pablo Rodriguez'?
 -- ¿Cuantos lugares no están en las anecdotas? (NOT IN)
-
-
 SELECT count(id) FROM anecdotas
 WHERE id NOT IN ( SELECT DISTINCT id_lugar FROM mn_lugares_anecdota WHERE id_lugar );
 
@@ -71,13 +109,20 @@ select p.id, p.nombre, t.nombre as curro from personaje p inner join trabajo t o
 -- Titulos de las anedoctas del capitulo 10
 -- Personajes que estén en capitulos traducidos al inglés
 -- ¿Que raza de personaje es más alto de media?
-SELECT r.id, r.nombre, avg(cf.altura) as media FROM personaje p LEFT JOIN raza r on r.id = p.id_raza LEFT JOIN carasteristicas_fisicas cf ON cf.id = p.id_fisicas group by r.id order by media limit 1;
+SELECT r.id, r.nombre, avg(cf.altura) as media
+FROM personaje p
+LEFT JOIN raza r on r.id = p.id_raza
+LEFT JOIN carasteristicas_fisicas cf ON cf.id = p.id_fisicas
+group by r.id
+order by media
+limit 1;
 
 -- Habilidades que no estuvieran en ninguna anecdota
-SELECT DISTINCT h.id FROM habilidades h
+SELECT * FROM habilidades h
+WHERE id NOT IN ( SELECT DISTINCT h.id FROM habilidades h
 JOIN mn_habilidad_personaje mnhp ON mnhp.id_habilidad = h.id
 JOIN personaje p ON p.id = mnhp.id_personaje
-JOIN mn_personaje_anectdota mnpa ON mnpa.id_personaje = p.id;
+JOIN mn_personaje_anectdota mnpa ON mnpa.id_personaje = p.id )
 
 -- Listado los personajes en cada capitulo
 -- ¿Cuanto tiempo ha pasado entre la anecdota más antigua y la más nueva?
@@ -100,8 +145,26 @@ WHERE pj.id = (
 SELECT count(p.id) as count FROM personaje p  JOIN mn_personaje_anectdota mn ON mn.id_personaje = p.id WHERE p.nombre = "Den, El Negro";
 -- ¿Cuantos personajes hubo en cada anecdota?
 -- ¿Que raza tiene la constitución más alta?
+SELECT r.id, r.nombre, MAX(cr.constitucion)
+FROM caracteristicas_rol AS cr
+JOIN personaje pj ON (pj.id_rol = cr.id)
+JOIN raza r ON (r.id = pj.id_raza)
+-- Media
+SELECT r.id, r.nombre, SUM(cr.constitucion) as suma
+FROM caracteristicas_rol AS cr
+LEFT JOIN personaje pj ON (pj.id_rol = cr.id)
+LEFT JOIN raza r ON (r.id = pj.id_raza)
+WHERE cr.constitucion IS NOT NULL AND r.id IS NOT NULL
+GROUP BY r.id
+ORDER BY suma DESC
+LIMIT 1
+
+
 -- ¿Cual es el apodo del personaje que más aparece en cada capitulo?
 -- Listado de Personajes de cada capitulo <= ¿Se puede hacer?
+
+
+
 -- Lugares más repetidos en los capitulos
 select l.* from mn_lugares_anecdota mn
 JOIN lugares l ON l.id = mn.id_lugar
@@ -119,8 +182,15 @@ JOIN carasteristicas_fisicas f ON p.id_fisicas = f.id
 ORDER by p.edad DESC
 LIMIT 1;
 
--- ¿Que trabajo suelen tener los elfos?
-
+-- ¿Que trabajo suelen tener los elfos? ('Elfo')
+SELECT t.id, t.nombre, count(pj.id) as contador
+FROM trabajo t
+LEFT JOIN personaje pj ON (pj.id_trabajo = t.id)
+WHERE pj.id_raza IN (
+	SELECT id FROM raza WHERE nombre LIKE "%Elfo%"
+)
+GROUP BY t.id
+ORDER BY contador DESC
 
 
 -- EXTRA:
