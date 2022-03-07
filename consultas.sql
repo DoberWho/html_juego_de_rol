@@ -112,10 +112,25 @@ LIMIT 1;
 
 
 
-EXTRA:
+-- EXTRA:
 -- -> Devuelve TODOS los personajes, los trabajos que tengan y rellena con null lo que no tengan trabajo
 select p.id, p.nombre, t.nombre as curro from personaje p left join trabajo t on t.id = p.id_trabajo;
 -- -> Devuevle TODOS los trabajos, y el primer personaje que tenga ese trabajo. Pero no los personajes que no tengan trabajo
 select p.id, p.nombre, t.nombre as curro from personaje p right join trabajo t on t.id = p.id_trabajo;
 -- -> Devuelve SOLO los personajes que tengan algun trabajo
 select p.id, p.nombre, t.nombre as curro from personaje p inner join trabajo t on t.id = p.id_trabajo;
+
+
+
+-- CREAR VISTAS
+CREATE VIEW lugaresRepetidos
+AS
+select l.* from mn_lugares_anecdota mn
+JOIN lugares l ON l.id = mn.id_lugar
+where mn.id_lugar
+group by mn.id_lugar
+having count(mn.id_anecdota) > 1
+ORDER by count(mn.id_anecdota) DESC;
+
+-- CONSULTAR VISTAS
+SELECT * FROM lugaresRepetidos;
