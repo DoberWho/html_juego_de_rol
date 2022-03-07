@@ -1,5 +1,5 @@
 --- ====
---- Orden
+--- Orden de importación
 -- habilidades
 -- tipo_relacion
 -- raza
@@ -85,6 +85,17 @@ select ((select max(cuando) from anecdotas) -- (select min(cuando) from anecdota
 
 -- ¿Cual es la media de fuerza de los Elfos?
 -- ¿Que personaje tiene la carisma más alta y quien lo interpreta?
+SELECT p.*, pj.nombre as personaje
+FROM persona p
+JOIN personaje pj ON (pj.id_persona = p.id)
+WHERE pj.id = (
+	SELECT pj.id
+	FROM juego_de_rol.caracteristicas_rol cr
+	JOIN juego_de_rol.personaje pj ON (pj.id_rol = cr.id)
+	ORDER BY cr.carisma DESC
+	LIMIT 1
+)
+
 -- ¿En cuantas anecdotas estuvo 'Den, El Negro'?
 SELECT count(p.id) as count FROM personaje p  JOIN mn_personaje_anectdota mn ON mn.id_personaje = p.id WHERE p.nombre = "Den, El Negro";
 -- ¿Cuantos personajes hubo en cada anecdota?
@@ -134,3 +145,16 @@ ORDER by count(mn.id_anecdota) DESC;
 
 -- CONSULTAR VISTAS
 SELECT * FROM lugaresRepetidos;
+
+-- CREATE A TRIGGER FROM INSERT IN PERSONAJE CHANGE EDAD if under 18 to 18
+-- https://www.siteground.es/kb/uso-triggers-mysql/
+-- https://www.neoguias.com/como-crear-y-utilizar-triggers-en-mysql/
+CREATE TRIGGER personaje_mayor_de_edad
+AFTER INSERT ON personaje
+FOR EACH ROW
+BEGIN
+    IF NEW.edad < 18 THEN
+        SET NEW.edad = 18;
+    END IF;
+END;
+
