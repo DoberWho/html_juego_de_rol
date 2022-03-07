@@ -109,3 +109,13 @@ ORDER by p.edad DESC
 LIMIT 1;
 
 -- ¿Que trabajo suelen tener los elfos?
+
+
+
+EXTRA:
+-- -> Devuelve TODOS los personajes, los trabajos que tengan y rellena con null lo que no tengan trabajo
+select p.id, p.nombre, t.nombre as curro from personaje p left join trabajo t on t.id = p.id_trabajo;
+-- -> Devuevle TODOS los trabajos, y el primer personaje que tenga ese trabajo. Pero no los personajes que no tengan trabajo
+select p.id, p.nombre, t.nombre as curro from personaje p right join trabajo t on t.id = p.id_trabajo;
+-- -> Devuelve SOLO los personajes que tengan algun trabajo
+select p.id, p.nombre, t.nombre as curro from personaje p inner join trabajo t on t.id = p.id_trabajo;
